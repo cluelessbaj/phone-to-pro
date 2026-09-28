@@ -20,6 +20,7 @@ import torch.nn.functional as F
 from PIL import Image
 
 from models.srfactory import SRCore, create_sr_core
+from .color_transform import luminance
 from .baseline import (
     apple_shadow_lift,
     conservative_levels,
@@ -65,6 +66,9 @@ class PhotoEnhancementPipeline(nn.Module):
         # 4. Precomputed Filmic Table
         self.register_buffer("filmic_table", build_filmic_table(1024))
 
+        # 5. Edge-Preserving Denoise Filter for sensor noise suppression
+        self.denoise_filter = SubsampledGuidedFilter(radius=4, eps=1e-3, s=4)
+
         self.eval()
 
     @torch.no_grad()
@@ -74,6 +78,7 @@ class PhotoEnhancementPipeline(nn.Module):
         mode: str = "sony",
         sony_route: str = "b",
         enable_sr: bool = True,
+        enable_denoise: bool = True,
         enable_wb: bool = True,
         enable_levels: bool = True,
         enable_sharpening: bool = True,
@@ -82,11 +87,15 @@ class PhotoEnhancementPipeline(nn.Module):
         # Step 1: Extract proxy thumbnail (256x256)
         thumb = F.interpolate(img, size=(256, 256), mode="bilinear", align_corners=False)
 
-        # Step 2: Super-Resolution Core (produces high-res neutral float32 tensor)
+        # Step 2: Super-Resolution Core or Edge-Preserving Denoising
         if enable_sr:
             hr_tensor = self.sr_core(img)
         else:
             hr_tensor = img.clone()
+
+        if enable_denoise and not enable_sr:
+            guide = luminance(hr_tensor)
+            hr_tensor = self.denoise_filter(guide, hr_tensor)
 
         # Step 3: Normalization (clamped gray-world WB + conservative levels)
         norm_tensor = hr_tensor

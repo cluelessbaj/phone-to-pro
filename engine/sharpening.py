@@ -67,17 +67,40 @@ def compute_resolution_scale(H: int, W: int, reference_mp: float = 12.0) -> floa
 def sony_sharpen(
     img: torch.Tensor,
     base_radius: float = 0.5,
-    amount: float = 0.35,
+    amount: float = 0.45,
+    coring_threshold: float = 0.005,
+    threshold_low: float = 0.008,
+    threshold_high: float = 0.035,
     scale_with_resolution: bool = True,
 ) -> torch.Tensor:
-    """Fine-radius single-scale unsharp mask for Sony Alpha look."""
+    """Fine-radius single-scale unsharp mask with coring and edge-masking for Sony Alpha look.
+
+    Emulates Sony BIONZ XR detail processing:
+    - Coring suppresses small-amplitude high-frequency noise in flat/shadow regions.
+    - Luminance edge mask targets MTF boost strictly along true subject contours.
+    """
     H, W = img.shape[2:]
     scale = compute_resolution_scale(H, W) if scale_with_resolution else 1.0
     r_eff = base_radius * scale
 
     blurred = gaussian_blur2d(img, r_eff)
     high_freq = img - blurred
-    sharpened = img + amount * high_freq
+
+    # 1. Coring: subtract small-amplitude noise
+    if coring_threshold > 0:
+        high_freq = torch.where(
+            high_freq.abs() > coring_threshold,
+            high_freq - torch.sign(high_freq) * coring_threshold,
+            torch.zeros_like(high_freq),
+        )
+
+    # 2. Edge-masking from luminance gradient to protect flat sky / smooth backgrounds
+    lum = luminance(img)
+    lum_blur = gaussian_blur2d(lum, r_eff * 2.0)
+    edge_gradient = (lum - lum_blur).abs()
+    edge_mask = smoothstep(edge_gradient, threshold_low, threshold_high)
+
+    sharpened = img + amount * high_freq * edge_mask
     return sharpened.clamp(0.0, 1.0)
 
 

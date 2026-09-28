@@ -102,6 +102,7 @@ def process_image(
     mode: str,
     sony_route: str,
     enable_sr: bool,
+    enable_denoise: bool,
     enable_sharpen: bool,
 ):
     print(f"Enhancing: {img_path.name} -> {out_path.name} [Mode: {mode.upper()}]")
@@ -114,6 +115,7 @@ def process_image(
         mode=mode,
         sony_route=sony_route,
         enable_sr=enable_sr,
+        enable_denoise=enable_denoise,
         enable_sharpening=enable_sharpen,
     )
     elapsed = time.perf_counter() - t0
@@ -162,6 +164,7 @@ def main():
             mode=args.mode,
             sony_route=args.sony_route,
             enable_sr=not args.no_sr,
+            enable_denoise=args.denoise > 0,
             enable_sharpen=not args.no_sharpen,
         )
     elif in_path.is_dir():
@@ -178,6 +181,7 @@ def main():
                 mode=args.mode,
                 sony_route=args.sony_route,
                 enable_sr=not args.no_sr,
+                enable_denoise=args.denoise > 0,
                 enable_sharpen=not args.no_sharpen,
             )
     else:
