@@ -1,0 +1,25 @@
+[project]
+name = "phone-to-pro"
+version = "0.1.0"
+description = "Neuro-parametric photo enhancement pipeline targeting Sony Alpha and Apple Photonic color science"
+readme = "plan.md"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "scipy>=1.12.0",
+    "numpy>=1.26.0",
+    "colour-science>=0.4.4",
+    "pillow>=10.2.0",
+    "opencv-python-headless>=4.9.0",
+    "pyyaml>=6.0.1",
+    "pytest>=8.0.0",
+]
+
+[tool.uv]
+extra-index-url = ["https://download.pytorch.org/whl/cpu"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]

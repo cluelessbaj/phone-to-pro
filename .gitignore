@@ -1,0 +1,29 @@
+# Python & Virtualenv
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing & Tools
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor & OS
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Large Model Weights and Artefacts
+*.pth
+*.pt
+*.bin
+*.onnx
+*.param
+weights/
+data/raw/
+outputs/
