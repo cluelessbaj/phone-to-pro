@@ -27,6 +27,13 @@ from .sharpening import (
     apple_sharpen,
     gaussian_blur2d,
 )
+from .baseline import (
+    gray_world_wb,
+    conservative_levels,
+    apple_shadow_lift,
+    sony_baseline_grade,
+)
+from .pipeline import PhotoEnhancementPipeline
 
 __all__ = [
     "configure_hardware_acceleration",
@@ -53,4 +60,9 @@ __all__ = [
     "sony_sharpen",
     "apple_sharpen",
     "gaussian_blur2d",
+    "gray_world_wb",
+    "conservative_levels",
+    "apple_shadow_lift",
+    "sony_baseline_grade",
+    "PhotoEnhancementPipeline",
 ]
