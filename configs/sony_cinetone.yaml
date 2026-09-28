@@ -1,0 +1,30 @@
+# Stage 2: Target Tuning for Sony Alpha (S-Cinetone / S-Log3)
+stage: "sony_cinetone"
+mode: "sony"
+dataset:
+  root_dir: "data/sony_synthetic"
+  patch_size: 256
+  thumb_size: 256
+  val_ratio: 0.1
+  batch_size: 8
+  num_workers: 4
+
+model:
+  backbone: "mobilenet_v3_small"
+  num_luts: 5
+  lut_dim: 33
+  spline_points: 5
+
+loss:
+  lambda_pixel: 1.0
+  lambda_cosine: 0.15
+  lambda_perc: 0.05
+  lambda_smooth: 0.0002
+  lambda_mono: 0.0200
+
+training:
+  epochs: 30
+  lr: 0.0001
+  weight_decay: 0.00001
+  lr_decay_step: 15
+  lr_decay_gamma: 0.5

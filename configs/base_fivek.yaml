@@ -1,0 +1,31 @@
+# Stage 1: Universal Base Pretraining on MIT-Adobe FiveK (Expert C Only)
+stage: "base_fivek"
+mode: "sony"
+dataset:
+  root_dir: "data/fivek"
+  expert_filter: "C"
+  patch_size: 256
+  thumb_size: 256
+  val_ratio: 0.1
+  batch_size: 8
+  num_workers: 4
+
+model:
+  backbone: "mobilenet_v3_small"
+  num_luts: 5
+  lut_dim: 33
+  spline_points: 5
+
+loss:
+  lambda_pixel: 1.0
+  lambda_cosine: 0.10
+  lambda_perc: 0.05
+  lambda_smooth: 0.0001
+  lambda_mono: 0.0100
+
+training:
+  epochs: 50
+  lr: 0.0003
+  weight_decay: 0.00001
+  lr_decay_step: 20
+  lr_decay_gamma: 0.5

@@ -1,0 +1,33 @@
+# Stage 3: Target Tuning for Apple Photonic / Smart HDR Mode
+stage: "apple_smart_hdr"
+mode: "apple"
+dataset:
+  root_dir: "data/apple_synthetic"
+  patch_size: 256
+  thumb_size: 256
+  val_ratio: 0.1
+  batch_size: 8
+  num_workers: 4
+
+model:
+  backbone: "mobilenet_v3_small"
+  num_luts: 5
+  lut_dim: 33
+  spatial_grid_size: 16
+  guided_filter_radius: 16
+  guided_filter_eps: 0.001
+  guided_filter_subsample: 4
+
+loss:
+  lambda_pixel: 1.0
+  lambda_cosine: 0.10
+  lambda_perc: 0.08
+  lambda_smooth: 0.0001
+  lambda_mono: 0.0100
+
+training:
+  epochs: 30
+  lr: 0.0001
+  weight_decay: 0.00001
+  lr_decay_step: 15
+  lr_decay_gamma: 0.5
