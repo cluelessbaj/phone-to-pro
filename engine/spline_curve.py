@@ -39,8 +39,8 @@ def build_filmic_table(n: int = 1024) -> torch.Tensor:
 
     Characteristics: gentle toe roll-off, organic mid contrast, soft compressed shoulder.
     """
-    xs = [0.0, 0.10, 0.50, 0.85, 1.0]
-    ys = [0.0, 0.06, 0.50, 0.93, 1.0]
+    xs = [0.0, 0.12, 0.40, 0.70, 0.90, 1.0]
+    ys = [0.0, 0.05, 0.34, 0.63, 0.85, 1.0]
     interp = PchipInterpolator(xs, ys)
     grid = np.linspace(0.0, 1.0, n, dtype=np.float32)
     table_np = interp(grid)

@@ -70,14 +70,20 @@ def conservative_levels(
     """Partial black and white point fit based on thumbnail luminance percentiles.
 
     Prevents aggressive clipping: never clips beyond the 1st/99th percentiles,
-    and enforces conservative black/white threshold caps.
+    enforces conservative black/white threshold caps, and protects bright highlights
+    from clipping blowout.
     """
     Y = luminance(thumb).flatten(start_dim=1)  # [B, H*W]
     p1 = torch.quantile(Y, 0.01, dim=1)
     p99 = torch.quantile(Y, 0.99, dim=1)
 
     b = p1.clamp(max=black_cap)[:, None, None, None]
-    w = p99.clamp(min=white_floor)[:, None, None, None]
+    
+    # Highlight protection: if image contains bright highlights (> white_floor),
+    # respect peak luminance so highlights and glowing structures are not clipped.
+    Y_max = luminance(img).flatten(start_dim=1).amax(dim=1)
+    w_effective = torch.where(Y_max > white_floor, torch.max(p99, Y_max), p99.clamp(min=white_floor))
+    w = w_effective[:, None, None, None]
 
     return ((img - b) / (w - b).clamp(min=1e-3)).clamp(0.0, 1.0)
 
